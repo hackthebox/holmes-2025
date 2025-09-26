@@ -1,6 +1,6 @@
 <img src="./assets/banner.png" style="max-width: 100%; height: auto;" align=left />
 
-# <center>Chapter 5 - The Payload<</center>
+# <center>Chapter 5 - The Payload</center>
 
 -----------
 
