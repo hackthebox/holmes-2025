@@ -1,7 +1,7 @@
 <p align='center'>
   <img src='assets/banner.png' alt="HTB">
 </p>
-# Holmes 2025
+# <center>Holmes 2025</center>
 
 <p align='center'>
   <img src='assets/ChallengeBanner.jpg' alt="Holmes 2025">

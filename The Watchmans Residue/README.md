@@ -1,6 +1,6 @@
 <img src="./assets/banner.png" style="max-width: 100%; height: auto;" align=left />
 
-# <center>Chapter 2 - The Watchman's Residue<</center>
+# <center>Chapter 2 - The Watchman's Residue</center>
 
 -----------
 
