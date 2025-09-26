@@ -44,11 +44,11 @@ Enter the artifacts provided along with their file hash here.
 
 To begin the analysis, the password-protected ZIP file was unlocked using the password `hacktheblue` and then we can confirm the integrity of the memory dump.
 
-![Memory dump hash](./Assets/memdump_hash.png)
+![Memory dump hash](./assets/memdump_hash.png)
 
 First, we inspect the file and extract the initial information to understand what we are dealing with.
 
-![Hexdump of the memory dump](./Assets/hexdump.png)
+![Hexdump of the memory dump](./assets/hexdump.png)
 
 The **hexdump** output shows that the initial few bytes are `EmiL`, indicating that this is a memory dump captured with [LiME](https://github.com/504ensicsLabs/LiME), the Linux Memory Extractor. Next, we must determine which Linux kernel and distribution this dump came from.
 
@@ -59,7 +59,7 @@ The **hexdump** output shows that the initial few bytes are `EmiL`, indicating t
 
 	**Volatility3** is probably one of the best tool to analyze memory dumps from different operating systems, including Linux systems. It has a very useful plugin called `banners` that attempts to identify potential Linux banners in an image.
 
-	![Volatility3 banners plugin](./Assets/banners.png)
+	![Volatility3 banners plugin](./assets/banners.png)
 	
 	As we can see from the output, it seems the memory dump came from a Debian OS running the Linux kernel `5.10.0-35-amd64`.  Armed with this information, we can answer the first question. However, to continue analyzing the image, we must create a profile for this operating system and load it into **Volatility3**.
 	
@@ -67,11 +67,11 @@ The **hexdump** output shows that the initial few bytes are `EmiL`, indicating t
 	
 	By simply searching for `debian 5.10.0-35-amd64`, we can immediately access the Debian packages [page](https://packages.debian.org/bullseye/amd64/linux-image-5.10.0-35-amd64-dbg/download), where we can download the Linux image containing the debug symbols for the indicated version.
 	
-	![Linux image](./Assets/debian_package.png)
+	![Linux image](./assets/debian_package.png)
 	
 	After downloading the file, we can extract the uncompressed kernel image with full debug symbols, as well as the `System.map`. We will use both of these files to create the **Volatility3** profile with the **dwarf2json** tool, compress it and copy into the folder `<volatility3_root>/volatility3/symbols/linux/`.
 	
-	![dwarf2json](./Assets/dwarf2json.png)
+	![dwarf2json](./assets/dwarf2json.png)
 	
 	**Answer:** <span style="color: #9FEF00;">`5.10.0-35-amd64`</span>
 
@@ -80,7 +80,7 @@ The **hexdump** output shows that the initial few bytes are `EmiL`, indicating t
 
 	When analyzing a Linux memory dump, one of the first plugins we can run is the `linux.bash` plugin to get an idea of the recent commands that have been run on the machine.
 
-	![Bash history](./Assets/bash_history.png)
+	![Bash history](./assets/bash_history.png)
 	
 	We can see that some basic information-gathering commands were run from a `bash` process with PID `13608`. 
 	
@@ -91,7 +91,7 @@ The **hexdump** output shows that the initial few bytes are `EmiL`, indicating t
 
 	To gain a clearer understanding of the situation, we used the `linux.pstree` plugin to analyze the hierarchy of processes identified via the Bash history.
 
-	![pstree plugin](./Assets/pstree.png)
+	![pstree plugin](./assets/pstree.png)
 	
 	By comparing the output of the `linux.pstree` plugin with the Bash history, we can see that, when the memory capture occurred, two SSH sessions were running. The first session (in the red box) spawned a `bash` process (13608), which ran information-gathering commands. Then, it invoked su to switch to another user and spawned a second `bash` process (PID 22714). These seem to be the most likely `bash` processes used by the attacker. 
 	
@@ -105,19 +105,19 @@ The **hexdump** output shows that the initial few bytes are `EmiL`, indicating t
 	
 	We can use the very powerful plugin, `linux.pagecache.Files`, to list files from memory along with their inode information and creation timestamp. We save the output to a file so then we can easily search into it.
 	
-	![json.log files](./Assets/json-log_files.png)
+	![json.log files](./assets/json-log_files.png)
 	
 	Now, if we grep for "**json.log**" on the output file we find 10 files corresponding to 10 different containers. Looking at their creation timestamps, we see that the second file in the list was created just five seconds after the suspicious Docker command (`docker run -v /etc/:/mnt -it alpine`) found in the Bash history. Therefore, this log file most likely belongs to the container we are looking for.
 	
 	Let's extract this file from memory using the plugin `linux.pagecache.InodePages` with the INode address `0x9b3386436f80` and the `--dump` option.
 	
-	![jm user added to passwd](./Assets/jm_password.png)
+	![jm user added to passwd](./assets/jm_password.png)
 	
 	The container's logs clearly show that, after mapping the host's `/etc/` folder to the container's `/mnt` folder, the attacker added a new root user to the `/etc/passwd` file. The new user is named `jm` and the hashed password is `$1$jm$poAH2RyJp8ZllyUvIkxxd0`. 
 	
 	We finally attempt to crack the password using **hashcat** with **rockyou.txt** wordlist and this is the result.
 	
-	![Cracked password](./Assets/cracked_password.png)
+	![Cracked password](./assets/cracked_password.png)
 	
 	**Answer:** <span style="color: #9FEF00;">`jm:WATSON0`</span>
 
@@ -128,11 +128,11 @@ The **hexdump** output shows that the initial few bytes are `EmiL`, indicating t
 
 	After running `linux.lsmod` and not noticing anything unusual, we run `linux.malware.hidden_modules` and discover that a stealth module has been loaded: `Nullincrevenge`.
 	
-	![Hidden module](./Assets/hidden_module.png)
+	![Hidden module](./assets/hidden_module.png)
 	
 	We can use the previous file containing the `linux.pagecache.Files` plugin output to retrieve the full path of where the module resides.
 	
-	![Module full path](./Assets/module_fullpath.png)
+	![Module full path](./assets/module_fullpath.png)
 	
 	**Answer:** <span style="color: #9FEF00;">`/usr/lib/modules/5.10.0-35-amd64/kernel/lib/Nullincrevenge.ko`</span>
 
@@ -141,11 +141,11 @@ The **hexdump** output shows that the initial few bytes are `EmiL`, indicating t
 
 	Now we can try to dump it from memory.
 
-	![Dumped module](./Assets/dumped_module.png)
+	![Dumped module](./assets/dumped_module.png)
 	
 	And then analyze its metadata with **modinfo**.
 	
-	![modinfo](./Assets/modinfo.png)
+	![modinfo](./assets/modinfo.png)
 	
 	**Answer:** <span style="color: #9FEF00;">`i-am-the@network.now`</span>
 
@@ -160,7 +160,7 @@ The **hexdump** output shows that the initial few bytes are `EmiL`, indicating t
 	
 	We can easily retrieve its PID by running the `linux.pslist` plugin (or `linux.pstree` again).
 	
-	![Dnsmasq](./Assets/dnsmasq.png)
+	![Dnsmasq](./assets/dnsmasq.png)
 	
 	**Answer:** <span style="color: #9FEF00;">`dnsmasq,38687`</span>
 
@@ -169,11 +169,11 @@ The **hexdump** output shows that the initial few bytes are `EmiL`, indicating t
 
 	As outlined in the previous description, **Dnsmasq** can be configured to operate as a DHCP server, enabling it to dynamically allocate IP addresses, default gateways, and DNS resolvers to client workstations that broadcast DHCP discovery requests on the network. By examining the **Dnsmasq** man page, we can see that the service, by default, relies on specific system files to store and retrieve configuration, such as range addresses, lease information, and resolver settings.
 
-	![Dnsmasq man page](./Assets/dnsmasq_manpage.png)
+	![Dnsmasq man page](./assets/dnsmasq_manpage.png)
 	
 	To determine which workstations have already obtained network configuration from **Dnsmasq**, we are particularly interested in its lease files. Therefore we can search for them in the files list previously recovered and, if available, dump them.
 	
-	![Dnsmasq leases](./Assets/dnsmasq_leases.png)
+	![Dnsmasq leases](./assets/dnsmasq_leases.png)
 	
 	**Answer:** <span style="color: #9FEF00;">`Parallax-5-WS-3`</span>
 
@@ -190,7 +190,7 @@ The **hexdump** output shows that the initial few bytes are `EmiL`, indicating t
 	
 	**bulk_extractor** retrieves a lot of data and also a `packets.pcap` file, let's analyze it with **Wireshark**. 
 	
-	![Username from pcap](./Assets/wireshark.png)
+	![Username from pcap](./assets/wireshark.png)
 	
 	When we set the filter for **HTTP** traffic, we immediately see that the victim workstation (192.168.211.52) connected to a different server (10.129.232.25) on port 8081, which hosts the **CogWork-1 People Portal**. 
 	
@@ -203,17 +203,17 @@ The **hexdump** output shows that the initial few bytes are `EmiL`, indicating t
 
 	The victim user browsed two pages on the **CogWork-1 People Portal**, `profile.php` and `tasks.php`. The second one contains a pending task that inform the user to update a software called **AetherDesk**.
 
-	![Tasks page](./Assets/tasks_page.png)
+	![Tasks page](./assets/tasks_page.png)
 	
 	Currently, the attacker can intercept and redirect traffic wherever they want. Moreover, the Bash history indicates that the attacker spawned a second Docker container after installing **Dnsmasq** and interacting with **iptables**. 
 	
 	By comparing the timestamp of the `docker run` command with the creation timestamp of the `<container_id>-json.log` files, we can examine the logs from the `jm_proxy` container. This container is based on the nginx image and was executed with a custom `default.conf`.
 	
-	![jm_proxy container](./Assets/jm_proxy.png)
+	![jm_proxy container](./assets/jm_proxy.png)
 	
 	Now let's dump it with `linux.pagecache.InodePages` plugin and review its content.
 	
-	![jm_proxy logs](./Assets/jm_proxy_logs.png)
+	![jm_proxy logs](./assets/jm_proxy_logs.png)
 	
 	**Answer:** <span style="color: #9FEF00;">`/win10/update/CogSoftware/AetherDesk-v74-77.exe`</span>
 
@@ -222,13 +222,13 @@ The **hexdump** output shows that the initial few bytes are `EmiL`, indicating t
 
 	To fully understand how the attacker manipulated the incoming traffic we must retrieve the **Dnsmasq** configuration. As we saw previously, the file that stores the settings is `/etc/dnsmasq.conf`. Let's retrieve and analyze it.
 
-	![Dnsmasq.conf](./Assets/dnsmasq_conf.png)
+	![Dnsmasq.conf](./assets/dnsmasq_conf.png)
 	
 	The configuration assigns our machine as the gateway and DNS resolver for client workstations that request DHCP. It then forwards all DNS requests to 8.8.8.8, except for requests to `updates.cogwork-1.net`, which are redirected to the machine itself.
 	
 	However, this is not the final redirect. As we saw earlier, the malicious update was downloaded inside the `jm_proxy` container. Therefore, we also need to retrieve the original `default.conf` file to determine the final redirect. As shown in the Bash history, the attacker created the file in the `/tmp` folder and then deleted it. Let's see if it is still available in memory.
 	
-	![default.conf](./Assets/default_conf.png)
+	![default.conf](./assets/default_conf.png)
 	
 	As we can see, the attacker intercepts requests to  `updates.cogwork-1.net` and redirects them to itself. There, an nginx proxy is listening on port 80 and redirects these requests again to `13.62.49.86:7477`.
 	

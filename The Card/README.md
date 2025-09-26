@@ -44,7 +44,7 @@ Enter the artifacts provided along with their file hash here.
 
 The analysis began by unzipping the ZIP file. Inside the archive, there were three log files: access.log, application.log, and waf.log. These are the log files from the Nicole Vale honeypot.
 
-![Unzipped archive](./Assets/0_unzipped_archive.png)
+![Unzipped archive](./assets/0_unzipped_archive.png)
 
 ## Questions
 
@@ -53,7 +53,7 @@ The analysis began by unzipping the ZIP file. Inside the archive, there were thr
 
 	Let's analyze the `access.log` file and find the **User-Agent** of the first request.
 
-	![User-Agent in access.log](./Assets/1_user_agent.png)
+	![User-Agent in access.log](./assets/1_user_agent.png)
 	
 	**Answer:** <span style="color: #9FEF00;">`Lilnunc/4A4D - SpecterEye`</span>
 
@@ -62,7 +62,7 @@ The analysis began by unzipping the ZIP file. Inside the archive, there were thr
 
 	We can answer this question by analyzing both the `application.log` and the `waf.log` files. For example, the `waf.log` file shows that a web shell was deployed shortly after some errors occurred.
 
-	![Web shell deployed](./Assets/2_webshell_filename.png)
+	![Web shell deployed](./assets/2_webshell_filename.png)
 	
 	**Answer:** <span style="color: #9FEF00;">`temp_4A4D.php`</span>
 
@@ -71,7 +71,7 @@ The analysis began by unzipping the ZIP file. Inside the archive, there were thr
 
 	Also this question can be answered by analyzing both the `application.log` and the `waf.log` files. For example, the `application.log` file shows that a `.sql` file has been downloaded.
 
-	![Downloaded database](./Assets/3_dumped_database.png)
+	![Downloaded database](./assets/3_dumped_database.png)
 	
 	**Answer:** <span style="color: #9FEF00;">`database_dump_4A4D.sql`</span>
 
@@ -80,7 +80,7 @@ The analysis began by unzipping the ZIP file. Inside the archive, there were thr
 
 	Upon analyzing the log files, it becomes evident almost immediately that the recurring string is `4A4D`. This string is the hexadecimal representation of "**JM**," the initials of **James Moriarty**. This is how **WATSON** implicitly tries to catch Holmes' attention.
 
-	![Recurring string](./Assets/4_recurring_string.png)
+	![Recurring string](./assets/4_recurring_string.png)
 	
 	**Answer:** <span style="color: #9FEF00;">`4A4D`</span>
 
