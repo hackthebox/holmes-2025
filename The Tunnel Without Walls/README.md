@@ -9,7 +9,7 @@
 -----------
 
 <p align="center">
-<img src="./Assets/The_Tunnel_Without_Walls.png" style="max-width: 49%;"/>
+<img src="./assets/The_Tunnel_Without_Walls.png" style="max-width: 49%;"/>
 </p>
 
 2025-09-03
