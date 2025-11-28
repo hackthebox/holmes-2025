@@ -266,7 +266,6 @@ Further down in the **Chainsaw** output we can see a new user is created around 
 	
 	
 	
-	
 12. **What is the MITRE ATT&CK ID associated with the previous technique used by the attacker to pivot to the internal system? (Format: Txxxx.xxx)**
 
 	
@@ -274,14 +273,14 @@ Further down in the **Chainsaw** output we can see a new user is created around 
 	Visiting the MITRE ATT&CK website we can quickly find the entry for this technique (`https://attack.mitre.org/techniques/T1090/001/`). This technique allows attackers to use compromised systems as a pivot to reach other internal systems they would not otherwise have access to.
 	
 	
-	![MITRE_1](/Users/vivisghost/Desktop/Work/Walkthroughs/HOLMES_CTF_3_Writeup_Official/assets/MITRE_1.png)
+	![MITRE_1](./assets/MITRE_1.png)
 	
 	
 	
 	Below we can see a table from a CISA paper `https://www.cisa.gov/sites/default/files/2024-03/aa24-038a_csa_prc_state_sponsored_actors_compromise_us_critical_infrastructure_3.pdf` outline how the threat actor**Volt Typoon** has used this exact same technique. 
 	
 	
-	![VT_MITRE](/Users/vivisghost/Desktop/Work/Walkthroughs/HOLMES_CTF_3_Writeup_Official/assets/VT_MITRE.png)
+	![VT_MITRE](./assets/VT_MITRE.png)
 	
 	
 	
